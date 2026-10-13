@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experiment 6 | ML Pipeline Access Control</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #070b12;
+    color: #e6edf3;
+    line-height: 1.6;
+}
+
+header {
+    padding: 30px 7%;
+    border-bottom: 1px solid #1d2633;
+    background: #0a1019;
+}
+
+.logo {
+    color: #35d07f;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+header h1 {
+    margin-top: 10px;
+    font-size: 36px;
+}
+
+header p {
+    color: #8b98a9;
+    margin-top: 8px;
+}
+
+.container {
+    width: 86%;
+    max-width: 1300px;
+    margin: auto;
+}
+
+section {
+    padding: 55px 0;
+}
+
+.section-title {
+    font-size: 26px;
+    margin-bottom: 12px;
+}
+
+.section-description {
+    color: #8b98a9;
+    margin-bottom: 30px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: #0c3322;
+    color: #35d07f;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.hero {
+    padding: 80px 0;
+}
+
+.hero h2 {
+    font-size: 52px;
+    max-width: 850px;
+    line-height: 1.1;
+}
+
+.hero h2 span {
+    color: #35d07f;
+}
+
+.hero p {
+    max-width: 750px;
+    color: #9aa7b7;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.stat {
+    background: #0c131d;
+    border: 1px solid #1b2735;
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.stat h3 {
+    font-size: 32px;
+    color: #35d07f;
+}
+
+.stat p {
+    color: #8b98a9;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background: #0c131d;
+    border: 1px solid #1b2735;
+    border-radius: 16px;
+    padding: 25px;
+}
+
+.card h3 {
+    margin-bottom: 12px;
+}
+
+.card p {
+    color: #9aa7b7;
+}
+
+.pipeline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stage {
+    padding: 18px 22px;
+    border: 1px solid #244333;
+    background: #0c1b14;
+    border-radius: 12px;
+    color: #35d07f;
+}
+
+.arrow {
+    color: #596879;
+    font-size: 22px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0c131d;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #1d2633;
+}
+
+th {
+    background: #111a25;
+    color: #35d07f;
+}
+
+td {
+    color: #b5c0cc;
+}
+
+.allow {
+    color: #35d07f;
+    font-weight: bold;
+}
+
+.deny {
+    color: #ff647c;
+    font-weight: bold;
+}
+
+.terminal {
+    background: #05080d;
+    border: 1px solid #202b38;
+    border-radius: 14px;
+    padding: 24px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    color: #a8f0c7;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+.terminal .danger {
+    color: #ff647c;
+}
+
+.terminal .info {
+    color: #67b7ff;
+}
+
+.workflow {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.workflow div {
+    padding: 20px;
+    text-align: center;
+    background: #0c131d;
+    border: 1px solid #1b2735;
+    border-radius: 12px;
+}
+
+.workflow strong {
+    display: block;
+    color: #35d07f;
+    margin-bottom: 5px;
+}
+
+footer {
+    border-top: 1px solid #1d2633;
+    padding: 30px 7%;
+    color: #6f7c8c;
+    text-align: center;
+}
+
+@media(max-width: 800px) {
+    .stats,
+    .grid,
+    .workflow {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h2 {
+        font-size: 38px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">DEVSEC MLOPS LAB</div>
+    <h1>Experiment 06</h1>
+    <p>ML Pipeline with Access Control</p>
+</header>
+
+<main class="container">
+
+<section class="hero">
+    <span class="badge">RBAC • AUDIT • LEAST PRIVILEGE</span>
+
+    <h2>
+        Secure ML Pipeline using
+        <span>Role-Based Access Control</span>
+    </h2>
+
+    <p>
+        Implementation of role-based permissions for machine learning
+        pipeline stages with access decisions, audit logging and runtime
+        security monitoring.
+    </p>
+</section>
+
+<section>
+    <h2 class="section-title">Security Overview</h2>
+    <p class="section-description">
+        Results from the implemented RBAC pipeline.
+    </p>
+
+    <div class="stats">
+
+        <div class="stat">
+            <h3>24</h3>
+            <p>Access Attempts</p>
+        </div>
+
+        <div class="stat">
+            <h3>15</h3>
+            <p>Allowed</p>
+        </div>
+
+        <div class="stat">
+            <h3>9</h3>
+            <p>Denied</p>
+        </div>
+
+        <div class="stat">
+            <h3>5</h3>
+            <p>Pipeline Stages</p>
+        </div>
+
+    </div>
+</section>
+
+<section>
+    <h2 class="section-title">RBAC Architecture</h2>
+
+    <div class="pipeline">
+
+        <div class="stage">User</div>
+        <div class="arrow">→</div>
+
+        <div class="stage">Role</div>
+        <div class="arrow">→</div>
+
+        <div class="stage">Permission Check</div>
+        <div class="arrow">→</div>
+
+        <div class="stage">ML Stage</div>
+        <div class="arrow">→</div>
+
+        <div class="stage">Audit Log</div>
+
+    </div>
+</section>
+
+<section>
+    <h2 class="section-title">ML Pipeline</h2>
+
+    <div class="workflow">
+
+        <div>
+            <strong>01</strong>
+            Extract
+        </div>
+
+        <div>
+            <strong>02</strong>
+            Transform
+        </div>
+
+        <div>
+            <strong>03</strong>
+            Train
+        </div>
+
+        <div>
+            <strong>04</strong>
+            Evaluate
+        </div>
+
+        <div>
+            <strong>05</strong>
+            Deploy
+        </div>
+
+    </div>
+</section>
+
+<section>
+    <h2 class="section-title">Role & Permission Matrix</h2>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Extract</th>
+                <th>Transform</th>
+                <th>Train</th>
+                <th>Evaluate</th>
+                <th>Deploy</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td>Data Engineer</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+                <td class="deny">✕</td>
+                <td class="deny">✕</td>
+                <td class="deny">✕</td>
+            </tr>
+
+            <tr>
+                <td>Data Scientist</td>
+                <td class="deny">✕</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+                <td class="deny">✕</td>
+            </tr>
+
+            <tr>
+                <td>ML Engineer</td>
+                <td class="deny">✕</td>
+                <td class="deny">✕</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+            </tr>
+
+            <tr>
+                <td>Admin</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+                <td class="allow">✓</td>
+            </tr>
+
+            <tr>
+                <td>Viewer</td>
+                <td class="deny">✕</td>
+                <td class="deny">✕</td>
+                <td class="deny">✕</td>
+                <td class="deny">✕</td>
+                <td class="deny">✕</td>
+            </tr>
+
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2 class="section-title">Access Control Results</h2>
+
+    <div class="terminal">
+[ALLOW] admin -> extract
+[ALLOW] admin -> train
+[ALLOW] admin -> deploy
+
+[DENY] data_scientist -> deploy
+[DENY] viewer -> train
+[DENY] ml_engineer -> extract
+
+[RESULT] Unauthorized operations blocked.
+[RESULT] Access decisions recorded in audit log.
+    </div>
+</section>
+
+<section>
+    <h2 class="section-title">Secure Deployment & Runtime Monitoring</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Deployment Security</h3>
+            <p>
+                Deployment access was restricted to authorized roles.
+                Unauthorized deployment attempts were denied.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Runtime Monitoring</h3>
+            <p>
+                Runtime activities and suspicious access attempts were
+                monitored and recorded as security events.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<section>
+    <h2 class="section-title">Runtime Security Output</h2>
+
+    <div class="terminal">
+[DEPLOY AUTHORIZED] ml_engineer
+Model deployment successful.
+
+Model Status      : RUNNING
+Runtime Security  : ACTIVE
+Access Monitoring : ACTIVE
+Audit Monitoring  : ACTIVE
+
+[SECURITY OK] ml_engineer -> predict
+[SECURITY OK] ml_engineer -> monitor
+
+<span class="danger">[SECURITY ALERT] viewer attempted deploy</span>
+<span class="danger">[SECURITY ALERT] viewer attempted predict</span>
+
+<span class="danger">[DEPLOY DENIED] viewer</span>
+
+Security Events : 8
+    </div>
+</section>
+
+<section>
+    <h2 class="section-title">Result</h2>
+
+    <div class="card">
+        <p>
+            RBAC was successfully implemented. Authorized actions were
+            allowed, unauthorized actions were denied, and all activities
+            were logged.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2 class="section-title">Conclusion</h2>
+
+    <div class="card">
+        <p>
+            RBAC provides secure, role-based access and follows the
+            principle of least privilege.
+        </p>
+    </div>
+</section>
+
+</main>
+
+<footer>
+    DevSecMLOps Laboratory • Experiment 06 • ML Pipeline Access Control
+</footer>
+
+</body>
+</html>
